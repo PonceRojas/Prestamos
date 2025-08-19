@@ -1,24 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Landing from "./pages/web/Landing";
+import AdminRoutes from "./pages/admin/routes/AdminRoutes";  // Importamos el archivo modular
+
+const showLanding = process.env.REACT_APP_SHOW_LANDING === "true";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Landing solo si está habilitada por .env */}
+        {showLanding && <Route path="/landing" element={<Landing />} />}
+
+        {/* Ruta raíz: redirige según la config */}
+        <Route
+          path="/"
+          element={showLanding ? <Navigate to="/landing" /> : <Login />}
+        />
+
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Rutas protegidas del admin (AdminRoutes maneja sus subrutas) */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* Redirección 404 */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

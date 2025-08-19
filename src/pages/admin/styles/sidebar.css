@@ -1,0 +1,28 @@
+.sidebar.collapsed {
+  width: 0px;
+}
+
+.sidebar.open {
+  width: 220px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 1000;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: #1e1e2f;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+}
