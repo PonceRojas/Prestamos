@@ -1,20 +1,22 @@
+// src/db/services/firebaseUsuariosService.js
 import {
   collection,
   getDocs,
   addDoc,
   deleteDoc,
   doc,
-} from 'firebase/firestore';
-import { db } from '../firebase'; // Corrección de la ruta
-// ...existing code...// asegúrate que el archivo sea `firebase.js`
-import AbstractUserService from './userServiceInterface'; // Asegúrate de que la ruta sea correcta
+} from "firebase/firestore";
+import { db, auth } from "../firebase"; // Ojo: importa auth aquí
+import { signInWithEmailAndPassword } from "firebase/auth";
+import AbstractUserService from "./userServiceInterface"; 
 
-const usersCollection = collection(db, 'users');
+const usersCollection = collection(db, "users");
 
 export default class FirebaseUserService extends AbstractUserService {
+  // --- Usuarios ---
   async fetchAll() {
     const snapshot = await getDocs(usersCollection);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   }
 
   async create(user) {
@@ -23,14 +25,18 @@ export default class FirebaseUserService extends AbstractUserService {
   }
 
   async delete(userId) {
-    await deleteDoc(doc(db, 'users', userId));
+    await deleteDoc(doc(db, "users", userId));
+    return { success: true };
   }
-  //Apartado para la Logica De Login para el usuario dentro de Firebase
-   async login(username, password) {
-    const { signInWithEmailAndPassword } = await import("firebase/auth");
-    const { auth } = await import("../firebase.jsx");
+
+  // --- Login (Firebase Auth) ---
+  async login(username, password) {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        username,
+        password
+      );
       return userCredential.user;
     } catch (err) {
       console.error("Error login Firebase:", err);
@@ -38,4 +44,3 @@ export default class FirebaseUserService extends AbstractUserService {
     }
   }
 }
-

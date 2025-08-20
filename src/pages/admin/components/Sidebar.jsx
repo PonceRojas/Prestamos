@@ -14,9 +14,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import StoreIcon from "@mui/icons-material/Store";
+
 
 const drawerWidth = 220;
 const closedDrawerWidth = 60;
@@ -24,10 +23,8 @@ const closedDrawerWidth = 60;
 const menuItems = [
   { path: "/admin", label: "Inicio", icon: <DashboardIcon /> },
   { path: "/admin/usuarios", label: "Usuarios", icon: <PeopleIcon /> },
-  //{ path: "/admin/productos", label: "Productos", icon: <InventoryIcon /> },
-  { path: "/admin/Pedirprestamo", label: "Crear Prestamos", icon: <ShoppingCartIcon /> },
-  //{ path: "/admin/compras", label: "Compras", icon: <StoreIcon /> },
-  //crear otra pantalla de documentos
+  { path: "/admin/Pedirprestamo", label: "Crear Prestamos", icon: <ShoppingCartIcon /> }, //Aqui agregas la vista de el a partado de Sidebar
+  { path: "/admin/SolicitarPrestamo", label: "Solicitud de prestamo", icon: <ShoppingCartIcon /> },
 ];
 
 const Sidebar = ({ open, handleDrawerToggle }) => {
@@ -46,12 +43,12 @@ const Sidebar = ({ open, handleDrawerToggle }) => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
-        [`& .MuiDrawer-paper`]: {
+        "& .MuiDrawer-paper": {
           width: open ? drawerWidth : closedDrawerWidth,
           boxSizing: "border-box",
           background: "#23234f",
           color: "#fff",
-          overflowX: "hidden", // <-- evita scroll horizontal
+          overflowX: "hidden",
           transition: (theme) =>
             theme.transitions.create("width", {
               easing: theme.transitions.easing.sharp,
@@ -73,13 +70,11 @@ const Sidebar = ({ open, handleDrawerToggle }) => {
         </IconButton>
       </Toolbar>
       <Box sx={{ overflowY: "auto", overflowX: "hidden" }}>
-        {/* Solo scroll vertical si es necesario, nunca horizontal */}
         <List>
           {menuItems.map((item) => (
             <ListItem
-              button
               key={item.path}
-              component={Link}
+              component={Link}  // Link ya hace la función de botón
               to={item.path}
               selected={location.pathname === item.path}
               sx={{
@@ -88,8 +83,7 @@ const Sidebar = ({ open, handleDrawerToggle }) => {
                 justifyContent: open ? "initial" : "center",
                 px: 2.5,
                 "&.Mui-selected": {
-                  background:
-                    "linear-gradient(90deg, #1e3c72 60%, #2a5298 100%)",
+                  background: "linear-gradient(90deg, #1e3c72 60%, #2a5298 100%)",
                   color: "#fff",
                   boxShadow: 2,
                 },
@@ -110,10 +104,7 @@ const Sidebar = ({ open, handleDrawerToggle }) => {
               >
                 {item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                sx={{ opacity: open ? 1 : 0 }}
-              />
+              <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
             </ListItem>
           ))}
         </List>

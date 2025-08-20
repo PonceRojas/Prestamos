@@ -24,7 +24,7 @@ import {
   Search as SearchIcon,
 } from "@mui/icons-material";
 
-import userService from "../../../db/services/userService"; 
+import userService from "../../../../db/services/userService"; 
 // 🔗 backend desacoplado: puede ser Firebase o MySQL
 
 const Usuarios = () => {

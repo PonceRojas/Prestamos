@@ -3,19 +3,20 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
-import Dashboard from "../pagesAdmin/Dashboard";
-import Usuarios from "../pagesAdmin/Usuarios";
-import Productos from "../pagesAdmin/Productos";
-import Prestamo from "../pagesAdmin/PedirPrestamo"; // Assuming 'Ventas' is the correct import for ventas
+import Dashboard from "../pagesAdmin/Home/Dashboard";
+import Usuarios from "../pagesAdmin/Usuarios/Usuarios";
 
+import Prestamo from "../pagesAdmin/Prestamos/GenerarPrestamo"; // Assuming 'Ventas' is the correct import for ventas
+import SolicitarPrestamo from "../pagesAdmin/SolicitudPrestamo/SolicitarPrestamo"; // Assuming 'SolicitarPrestamo' is the correct import for solicitar prestamos
 
 const AdminRoutes = () => (
   <Routes>
     <Route path="/" element={<AdminLayout />}>
       <Route index element={<Dashboard />} />
       <Route path="usuarios" element={<Usuarios />} />
-      <Route path="productos" element={<Productos />} />
+      
       <Route path="Pedirprestamo" element={<Prestamo />} /> {/* Assuming 'Compras' is similar to 'Ventas' */} 
+      <Route path="SolicitarPrestamo" element={<SolicitarPrestamo />} />
     </Route>
   </Routes>
 );
