@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Grid, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Paper, Grid, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Box } from "@mui/material";
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 
 import prestamoService from "./prestamoService";
 import solicitarService from "../SolicitudPrestamo/solicitarService";
@@ -8,6 +8,14 @@ import solicitarService from "../SolicitudPrestamo/solicitarService";
 import PrestamoSearch from "./components/PrestamoSearch";
 import PrestamoTable from "./components/PrestamoTable";
 import PrestamoForm from "./components/PrestamoForm";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 
 const PedirPrestamo = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -15,6 +23,10 @@ const PedirPrestamo = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+
+  // Modal de detalles
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedPrestamo, setSelectedPrestamo] = useState(null);
 
   useEffect(() => {
     prestamoService.fetchAll().then(setPrestamos).catch(console.error);
@@ -29,11 +41,12 @@ const PedirPrestamo = () => {
 
   const handleAdd = () => { setEditing(null); setFormOpen(true); };
   const handleEdit = (p) => { setEditing(p); setFormOpen(true); };
+
   const handleView = (p) => {
-    alert(
-      `Cliente: ${p.cliente}\nCarnet: ${p.carnet}\nCelular: ${p.celular}\nContacto Familiar: ${p.contactoFamiliar}\nMonto: ${p.monto}\nFecha: ${p.fecha}\nEstado: ${p.estado}\nDetalles: ${p.detalles}`
-    );
+    setSelectedPrestamo(p);
+    setDetailsOpen(true);
   };
+
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar préstamo?")) {
       await prestamoService.delete(id);
@@ -113,11 +126,48 @@ const PedirPrestamo = () => {
         </Paper>
       )}
 
-      {/* 🔹 Tabla de préstamos */}
+      {/* Tabla de préstamos sin detalles ni estado */}
       <PrestamoTable prestamos={filteredPrestamos} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
 
-      {/* 🔹 Formulario */}
+      {/* Formulario */}
       <PrestamoForm open={formOpen} onClose={() => setFormOpen(false)} onSave={handleSave} prestamo={editing} />
+
+      {/* Modal de detalles */}
+      {selectedPrestamo && (
+        <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle>
+            Detalles del Préstamo
+            <IconButton
+              aria-label="cerrar"
+              onClick={() => setDetailsOpen(false)}
+              sx={{ position: "absolute", right: 8, top: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <Typography><strong>Cliente:</strong> {selectedPrestamo.cliente}</Typography>
+            <Typography><strong>Carnet:</strong> {selectedPrestamo.carnet}</Typography>
+            <Typography><strong>Celular:</strong> {selectedPrestamo.celular}</Typography>
+            <Typography><strong>Contacto Familiar:</strong> {selectedPrestamo.contactoFamiliar}</Typography>
+            <Typography><strong>Monto:</strong> {selectedPrestamo.monto}</Typography>
+            <Typography><strong>Fecha:</strong> {selectedPrestamo.fecha}</Typography>
+            <Typography><strong>Detalles:</strong> {selectedPrestamo.detalles}</Typography>
+
+            {/* Fotos */}
+            {selectedPrestamo.fotos && selectedPrestamo.fotos.length > 0 && (
+              <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {selectedPrestamo.fotos.map((url, idx) => (
+                  <img key={idx} src={url} alt={`Foto ${idx}`} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 4, cursor: "pointer" }} onClick={() => window.open(url, "_blank")} />
+                ))}
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDetailsOpen(false)}>Cerrar</Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Paper>
   );
 };
