@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Grid, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Box } from "@mui/material";
-import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
-
+import { Paper, Grid, Typography, Button, Box } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
 import prestamoService from "./prestamoService";
 import solicitarService from "../SolicitudPrestamo/solicitarService";
-
 import PrestamoSearch from "./components/PrestamoSearch";
 import PrestamoTable from "./components/PrestamoTable";
 import PrestamoForm from "./components/PrestamoForm";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import PrestamoDetailsModal from "./components/PrestamoDetailsModal";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
 const PedirPrestamo = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -23,8 +15,6 @@ const PedirPrestamo = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-
-  // Modal de detalles
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedPrestamo, setSelectedPrestamo] = useState(null);
 
@@ -35,25 +25,16 @@ const PedirPrestamo = () => {
       .catch(console.error);
   }, []);
 
-  const filteredPrestamos = prestamos.filter(p =>
-    p.cliente.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const filteredPrestamos = prestamos.filter(p => p.cliente.toLowerCase().includes(searchTerm.toLowerCase()));
   const handleAdd = () => { setEditing(null); setFormOpen(true); };
   const handleEdit = (p) => { setEditing(p); setFormOpen(true); };
-
-  const handleView = (p) => {
-    setSelectedPrestamo(p);
-    setDetailsOpen(true);
-  };
-
+  const handleView = (p) => { setSelectedPrestamo(p); setDetailsOpen(true); };
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar préstamo?")) {
       await prestamoService.delete(id);
       setPrestamos(prestamos.filter(p => p.id !== id));
     }
   };
-
   const handleSave = async (form) => {
     if (editing) {
       const updated = await prestamoService.update(editing.id, form);
@@ -63,8 +44,9 @@ const PedirPrestamo = () => {
       setPrestamos([...prestamos, created]);
     }
     setFormOpen(false);
+    setEditing(null);
   };
-
+  const handleCloseForm = () => { setFormOpen(false); setEditing(null); };
   const handleAceptarSolicitud = async (solicitud) => {
     if(window.confirm("¿Aceptar esta solicitud?")){
       const prestamoCreado = await prestamoService.aceptarSolicitud(solicitud);
@@ -74,7 +56,7 @@ const PedirPrestamo = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, m: 2, borderRadius: "12px" }}>
+    <Paper elevation={3} sx={{ p: 4, m: 2, borderRadius: "12px", filter: formOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s ease-in-out' }}>
       <Grid container spacing={3} alignItems="center" mb={3}>
         <Grid item xs={12} md={6}>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "primary.main" }}>
@@ -91,7 +73,6 @@ const PedirPrestamo = () => {
           </Button>
         </Grid>
       </Grid>
-
       {solicitudes.length > 0 && (
         <Paper sx={{ p: 2, mb: 4, borderRadius: "12px" }}>
           <Typography variant="h6" gutterBottom>Solicitudes Pendientes</Typography>
@@ -125,51 +106,14 @@ const PedirPrestamo = () => {
           </TableContainer>
         </Paper>
       )}
-
-      {/* Tabla de préstamos sin detalles ni estado */}
       <PrestamoTable prestamos={filteredPrestamos} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
-
-      {/* Formulario */}
-      <PrestamoForm open={formOpen} onClose={() => setFormOpen(false)} onSave={handleSave} prestamo={editing} />
-
-      {/* Modal de detalles */}
-      {selectedPrestamo && (
-        <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>
-            Detalles del Préstamo
-            <IconButton
-              aria-label="cerrar"
-              onClick={() => setDetailsOpen(false)}
-              sx={{ position: "absolute", right: 8, top: 8 }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Typography><strong>Cliente:</strong> {selectedPrestamo.cliente}</Typography>
-            <Typography><strong>Carnet:</strong> {selectedPrestamo.carnet}</Typography>
-            <Typography><strong>Celular:</strong> {selectedPrestamo.celular}</Typography>
-            <Typography><strong>Contacto Familiar:</strong> {selectedPrestamo.contactoFamiliar}</Typography>
-            <Typography><strong>Monto:</strong> {selectedPrestamo.monto}</Typography>
-            <Typography><strong>Fecha:</strong> {selectedPrestamo.fecha}</Typography>
-            <Typography><strong>Detalles:</strong> {selectedPrestamo.detalles}</Typography>
-
-            {/* Fotos */}
-            {selectedPrestamo.fotos && selectedPrestamo.fotos.length > 0 && (
-              <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
-                {selectedPrestamo.fotos.map((url, idx) => (
-                  <img key={idx} src={url} alt={`Foto ${idx}`} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 4, cursor: "pointer" }} onClick={() => window.open(url, "_blank")} />
-                ))}
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDetailsOpen(false)}>Cerrar</Button>
-          </DialogActions>
-        </Dialog>
-      )}
+      <PrestamoForm open={formOpen} onClose={handleCloseForm} onSave={handleSave} prestamo={editing} />
+      <PrestamoDetailsModal
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        prestamo={selectedPrestamo}
+      />
     </Paper>
   );
 };
-
 export default PedirPrestamo;
