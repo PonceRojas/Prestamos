@@ -8,15 +8,16 @@ import Usuarios from "../pagesAdmin/Usuarios/Usuarios";
 
 import Prestamo from "../pagesAdmin/Prestamos/GenerarPrestamo"; // Assuming 'Ventas' is the correct import for ventas
 import SolicitarPrestamo from "../pagesAdmin/SolicitudPrestamo/SolicitarPrestamo"; // Assuming 'SolicitarPrestamo' is the correct import for solicitar prestamos
+import RealizarPago from "../pagesAdmin/Pagos/RealizarPago";
 
 const AdminRoutes = () => (
   <Routes>
     <Route path="/" element={<AdminLayout />}>
       <Route index element={<Dashboard />} />
       <Route path="usuarios" element={<Usuarios />} />
-      
       <Route path="Pedirprestamo" element={<Prestamo />} /> {/* Assuming 'Compras' is similar to 'Ventas' */} 
       <Route path="SolicitarPrestamo" element={<SolicitarPrestamo />} />
+      <Route path="Pagos" element={<RealizarPago />} />
     </Route>
   </Routes>
 );

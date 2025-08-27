@@ -85,6 +85,7 @@ const PedirPrestamo = () => {
                   <TableCell>Plazo</TableCell>
                   <TableCell>Motivo</TableCell>
                   <TableCell>Acciones</TableCell>
+                  <TableCell>Interés</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

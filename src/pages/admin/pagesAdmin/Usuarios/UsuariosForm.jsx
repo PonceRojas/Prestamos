@@ -1,8 +1,9 @@
 // src/pages/admin/pagesAdmin/Usuarios/UsuarioForm.jsx
 import React, { useState, useEffect } from "react";
 import ModalReutilizable from "../../../../shared/componentes/modal/modal";
-import { TextField, Grid, Button } from "@mui/material";
-import ActionButtons from "../../../../components/ActionButtons";
+import { TextField, Grid } from "@mui/material";
+
+import ActionButtons from "../../../../shared/buttoms/ActionButtons";
 
 
 const UsuarioForm = ({ open, onClose, onSave, usuario }) => {

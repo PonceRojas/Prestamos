@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ModalReutilizable from "../../../../../shared/componentes/modal/modal";
 import FormFields from "../../../../../components/FormFields";
-import PhotoUpload from "../../../../../components/PhotoUpload";
-import ActionButtons from "../../../../../components/ActionButtons";
+import PhotoUpload from "../../../../../shared/buttoms/PhotoUpload";
+import ActionButtons from "../../../../../shared/buttoms/ActionButtons";
 
 const PrestamoForm = ({ open, onClose, onSave, prestamo }) => {
   const [form, setForm] = useState({

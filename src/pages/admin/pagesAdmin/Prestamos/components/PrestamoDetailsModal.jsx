@@ -10,7 +10,6 @@ import {
   Paper,
   Box,
   MobileStepper,
-  IconButton,
 } from "@mui/material";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 
@@ -29,6 +28,14 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
   const handleBack = () => {
     setActiveStep((prev) => (prev - 1 + maxSteps) % maxSteps);
   };
+
+  // Cálculos de interés del mes (sobre saldo si existe; si no, sobre monto)
+  const saldoBase =
+    typeof prestamo.saldo === "number"
+      ? Number(prestamo.saldo)
+      : Number(prestamo.monto) || 0;
+  const interesPct = Number(prestamo.interes) || 0;
+  const interesMesBs = Number((saldoBase * (interesPct / 100)).toFixed(2));
 
   return (
     <Dialog
@@ -58,19 +65,28 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
                 borderRadius: "8px",
               }}
               src={fotos[activeStep]}
+              alt={`Foto ${activeStep + 1}`}
             />
             <MobileStepper
               steps={maxSteps}
               position="static"
               activeStep={activeStep}
               nextButton={
-                <Button size="small" onClick={handleNext} disabled={maxSteps === 1}>
+                <Button
+                  size="small"
+                  onClick={handleNext}
+                  disabled={maxSteps === 1}
+                >
                   Siguiente
                   <KeyboardArrowRight />
                 </Button>
               }
               backButton={
-                <Button size="small" onClick={handleBack} disabled={maxSteps === 1}>
+                <Button
+                  size="small"
+                  onClick={handleBack}
+                  disabled={maxSteps === 1}
+                >
                   <KeyboardArrowLeft />
                   Anterior
                 </Button>
@@ -81,7 +97,7 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
 
         {/* Información general */}
         <Grid container spacing={2} mb={2}>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Typography>
               <strong>Cliente:</strong> {prestamo.cliente}
             </Typography>
@@ -91,8 +107,12 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
             <Typography>
               <strong>Celular:</strong> {prestamo.celular}
             </Typography>
+            <Typography>
+              <strong>Contacto familiar:</strong>{" "}
+              {prestamo.contactoFamiliar || "—"}
+            </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Typography>
               <strong>Monto:</strong> {prestamo.monto}
             </Typography>
@@ -102,6 +122,18 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
             <Typography>
               <strong>Estado:</strong> {prestamo.estado || "Pendiente"}
             </Typography>
+            <Typography>
+              <strong>Interés mensual:</strong> {interesPct}%
+            </Typography>
+            <Typography>
+              <strong>Interés del mes (Bs):</strong> {interesMesBs}
+            </Typography>
+            {typeof prestamo.saldo === "number" && (
+              <Typography>
+                <strong>Saldo actual (sin capitalizar aquí):</strong>{" "}
+                {prestamo.saldo}
+              </Typography>
+            )}
           </Grid>
         </Grid>
 
@@ -112,13 +144,17 @@ const PrestamoDetailsModal = ({ open, onClose, prestamo }) => {
         <Paper
           variant="outlined"
           sx={{
-            p: 3, // ✅ Aumentado el padding para más espacio
+            p: 3,
             borderRadius: "12px",
             backgroundColor: "grey.50",
-            minHeight: "150px", // ✅ Nueva altura mínima para un cuadro más grande
+            minHeight: 180,
+            maxHeight: 360,
+            overflowY: "auto",
           }}
         >
-          <Typography>{prestamo.detalles || "Sin detalles adicionales."}</Typography>
+          <Typography whiteSpace="pre-wrap">
+            {prestamo.detalles || "Sin detalles adicionales."}
+          </Typography>
         </Paper>
       </DialogContent>
 

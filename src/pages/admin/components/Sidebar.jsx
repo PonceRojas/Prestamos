@@ -15,7 +15,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
+import { Payment } from "@mui/icons-material";
 
 const drawerWidth = 220;
 const closedDrawerWidth = 60;
@@ -24,7 +24,8 @@ const menuItems = [
   { path: "/admin", label: "Inicio", icon: <DashboardIcon /> },
   { path: "/admin/usuarios", label: "Usuarios", icon: <PeopleIcon /> },
   { path: "/admin/Pedirprestamo", label: "Crear Prestamos", icon: <ShoppingCartIcon /> }, //Aqui agregas la vista de el a partado de Sidebar
-  { path: "/admin/SolicitarPrestamo", label: "Solicitud de prestamo", icon: <ShoppingCartIcon /> },
+  /* { path: "/admin/solicitar-prestamo", label: "Solicitar Préstamo", icon: <ShoppingCartIcon /> }, */
+  { path: "/admin/pagos", label: "Pagos", icon: <Payment /> },
 ];
 
 const Sidebar = ({ open, handleDrawerToggle }) => {

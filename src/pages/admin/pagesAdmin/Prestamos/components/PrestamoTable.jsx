@@ -37,7 +37,7 @@ const PrestamoTable = ({ prestamos, onView, onEdit, onDelete }) => {
               Carnet
             </TableCell>
             <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-              Celular
+              Interés (%/mes)
             </TableCell>
             <TableCell sx={{ color: "white", fontWeight: "bold" }}>
               Monto
@@ -73,7 +73,7 @@ const PrestamoTable = ({ prestamos, onView, onEdit, onDelete }) => {
               >
                 <TableCell>{p.cliente}</TableCell>
                 <TableCell>{p.carnet}</TableCell>
-                <TableCell>{p.celular}</TableCell>
+                 <TableCell>{p.interes ?? 0}</TableCell>
                 <TableCell>{p.monto}</TableCell>
                 <TableCell>{p.fecha}</TableCell>
                 <TableCell align="right">
