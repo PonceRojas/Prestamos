@@ -1,79 +1,52 @@
 // src/pages/admin/pagesAdmin/Pagos/pagoService.js
-import { db } from "../../../../db/firebase";
+import { db } from "../../../../db/firebase"; // Asegúrate de importar correctamente la instancia de db
 import {
   collection,
-  addDoc,
   getDocs,
-  doc,
-  runTransaction,
   query,
   where,
   orderBy,
+  addDoc,
+  doc,
+  updateDoc,
+  runTransaction,
   serverTimestamp,
-} from "firebase/firestore";
+} from "firebase/firestore";  // Aquí importas las funciones necesarias
 
-const COLL_PAGOS = "pagos";
-const COLL_PRESTAMOS = "prestamos";
-const COLL_HISTORIAL = "historialPrestamos";
-
-const monthsDiff = (fromISO, toISO) => {
-  const from = fromISO ? new Date(fromISO) : new Date();
-  const to = toISO ? new Date(toISO) : new Date();
-  const y = to.getFullYear() - from.getFullYear();
-  const m = to.getMonth() - from.getMonth();
-  let months = y * 12 + m;
-  if (to.getDate() < from.getDate()) months -= 1;
-  return Math.max(0, months);
-};
-
-async function capitalizarSiCorresponde(tx, prestamoRef) {
-  const snap = await tx.get(prestamoRef);
-  if (!snap.exists()) throw new Error("Préstamo no encontrado");
-  const p = snap.data();
-
-  const interes = Number(p.interes) || 0;
-  if (interes <= 0) return p;
-
-  const ultima = p.ultimaCapitalizacion || p.fecha || new Date().toISOString();
-  const ahora = new Date().toISOString();
-  const nMeses = monthsDiff(ultima, ahora);
-  if (nMeses <= 0) return p; // ⬅️ NADA si no hay meses completos
-
-  const saldoActual = typeof p.saldo === "number" ? Number(p.saldo) : Number(p.monto) || 0;
-  const factor = Math.pow(1 + interes / 100, nMeses);
-  const saldoNuevo = Number((saldoActual * factor).toFixed(2));
-
-  tx.update(prestamoRef, {
-    saldo: saldoNuevo,
-    ultimaCapitalizacion: ahora,
-    actualizadoEn: serverTimestamp(),
-  });
-
-  return { ...p, saldo: saldoNuevo, ultimaCapitalizacion: ahora };
-}
-
+import { capitalizarSiCorresponde } from "./capitalizacionService"; // Ajusta la ruta si es necesario
+// Función para obtener los préstamos activos
 export async function fetchPrestamosActivos() {
-  const snap = await getDocs(collection(db, COLL_PRESTAMOS));
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const snapshot = await getDocs(collection(db, "prestamos"));
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
+// Función para obtener los pagos de un préstamo específico
 export async function fetchPagosPorPrestamo(prestamoId) {
-  const qy = query(
-    collection(db, COLL_PAGOS),
+  const q = query(
+    collection(db, "pagos"),
     where("prestamoId", "==", prestamoId),
     orderBy("creadoEn", "desc")
   );
-  const snap = await getDocs(qy);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function registrarPago({ prestamoId, cliente, monto, fecha, metodo, referencia, notas }) {
+// Función para registrar un pago
+export async function registrarPago({
+  prestamoId,
+  cliente,
+  monto,
+  fecha,
+  metodo,
+  referencia,
+  notas,
+}) {
   if (!prestamoId) throw new Error("prestamoId es requerido");
   const pago = Number(monto);
   if (!pago || pago <= 0) throw new Error("Monto de pago inválido");
 
-  const prestamoRef = doc(db, COLL_PRESTAMOS, prestamoId);
-  const pagosCol = collection(db, COLL_PAGOS);
+  const prestamoRef = doc(db, "prestamos", prestamoId);
+  const pagosCol = collection(db, "pagos");
 
   const result = await runTransaction(db, async (tx) => {
     // 1) Capitalizar SOLO si pasaron meses completos
@@ -108,12 +81,11 @@ export async function registrarPago({ prestamoId, cliente, monto, fecha, metodo,
       saldo: saldoNuevo,
       estado: nuevoEstado,
       actualizadoEn: serverTimestamp(),
-      // nota: ultimaCapitalizacion ya fue movida en capitalizarSiCorresponde si correspondía
     });
 
     // 5) Archivar si quedó saldado
     if (saldoNuevo <= 0) {
-      await addDoc(collection(db, COLL_HISTORIAL), {
+      await addDoc(collection(db, "historialPrestamos"), {
         ...pCap, // snapshot del préstamo antes del último descuento
         idPrestamo: prestamoId,
         saldoFinal: 0,
@@ -129,7 +101,6 @@ export async function registrarPago({ prestamoId, cliente, monto, fecha, metodo,
         ...pCap,
         saldo: saldoNuevo,
         estado: nuevoEstado,
-        // si no se capitalizó en esta operación, conservar la marca original
         ultimaCapitalizacion: pCap.ultimaCapitalizacion || pCap.fecha,
       },
     };

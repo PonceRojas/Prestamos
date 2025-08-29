@@ -1,4 +1,3 @@
-// src/pages/admin/pagesAdmin/Pagos/RealizarPago.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Paper,
@@ -166,31 +165,30 @@ export default function RealizarPago() {
     setFormOpen(true);
   };
 
-// Verifica que este bloque esté bien:
-const abrirDetalles = async (prestamo) => {
-  try {
-    // 1. Consulta los pagos
-    const pagos = await fetchPagosPorPrestamo(prestamo.id);
-console.log("Pagos cargados:", pagos); 
+  // Verifica que este bloque esté bien:
+  const abrirDetalles = async (prestamo) => {
+    try {
+      // 1. Consulta los pagos
+      const pagos = await fetchPagosPorPrestamo(prestamo.id);
+      console.log("Pagos cargados:", pagos);
 
-  // 2. Combina el objeto del préstamo con el array de pagos
-    const prestamoConPagos = {
-    ...prestamo,
-    pagos: pagos,
+      // 2. Combina el objeto del préstamo con el array de pagos
+      const prestamoConPagos = {
+        ...prestamo,
+        pagos: pagos,
+      };
+
+      // 3. Guarda el objeto combinado en el estado
+      setPrestamoSeleccionado(prestamoConPagos);
+
+      // 4. Abre el modal
+      setDetalleOpen(true);
+
+    } catch (e) {
+      console.error(e);
+      setError("No se pudo cargar el historial de pagos.");
+    }
   };
-
-    // 3. Guarda el objeto combinado en el estado
-    setPrestamoSeleccionado(prestamoConPagos); 
-
-    // 4. Abre el modal
-    setDetalleOpen(true); 
-
-  } catch (e) {
-    console.error(e);
-    setError("No se pudo cargar el historial de pagos.");
-  }
-};
-
 
   const guardarPago = async (form) => {
     try {

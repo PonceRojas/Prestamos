@@ -24,8 +24,12 @@ const PedirPrestamo = () => {
       .then(data => setSolicitudes(data.filter(s => s.estado === "Pendiente")))
       .catch(console.error);
   }, []);
+// En este apartado esta la funcion para EL FILTRADO de datos 
+  const filteredPrestamos = prestamos.filter(p =>
+  p.cliente.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  p.carnet.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
-  const filteredPrestamos = prestamos.filter(p => p.cliente.toLowerCase().includes(searchTerm.toLowerCase()));
   const handleAdd = () => { setEditing(null); setFormOpen(true); };
   const handleEdit = (p) => { setEditing(p); setFormOpen(true); };
   const handleView = (p) => { setSelectedPrestamo(p); setDetailsOpen(true); };
